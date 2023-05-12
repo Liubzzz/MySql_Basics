@@ -17,8 +17,6 @@ connectionMySql.connect(function (err) {
     var childTableSQL =
       "CREATE TABLE IF NOT EXISTS child_table (id INT PRIMARY KEY AUTO_INCREMENT, parent_id INT, value VARCHAR(255), FOREIGN KEY (parent_id) REFERENCES parent_table(id))";
 
-    var viewSQL = "CREATE VIEW family AS SELECT name FROM parent_table";
-
     connectionMySql.query(parentTableSQL, (err, result) => {
       if (err) {
         console.log(err);
@@ -32,13 +30,6 @@ connectionMySql.connect(function (err) {
         console.log(err);
       } else {
         console.log("Child table created successfully");
-      }
-    });
-    connectionMySql.query(viewSQL, (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("view table created successfully");
       }
     });
 
@@ -70,11 +61,49 @@ connectionMySql.connect(function (err) {
         if (err) {
           console.log(err);
         } else {
-          console.log("Records added to child_table successfully");
+          console.log("Records added to parent_table successfully");
         }
       }
     );
-
-
+    var createViewSQL =
+      "CREATE VIEW family AS SELECT parent_table.name FROM parent_table JOIN child_table ON parent_table.id = child_table.parent_id";
+    connectionMySql.query(createViewSQL, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("View created successfully");
+      }
+    });
   }
 });
+
+// const { Sequelize, DataTypes } = require('sequelize');
+// const sequelize = new Sequelize('mysql://username:password@localhost:3306/mydatabase');
+
+// const User = sequelize.define('User', {
+//   name: {
+//     type: DataTypes.STRING,
+//     allowNull: false
+//   },
+//   email: {
+//     type: DataTypes.STRING,
+//     allowNull: false,
+//     unique: true
+//   },
+//   password: {
+//     type: DataTypes.STRING,
+//     allowNull: false
+//   }
+// });
+
+// async function getUserByEmail(email) {
+//   const user = await User.findOne({ where: { email } });
+//   return user;
+// }
+
+// (async () => {
+//   await sequelize.sync();
+//   const user = await getUserByEmail('example@example.com');
+//   console.log(user.name);
+// })();
+
